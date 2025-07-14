@@ -1,0 +1,198 @@
+﻿@page
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model TravelWebsiteV3.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div id="home" class="section">
+    <div class="home-slider-background">
+        <img src="/Content/plane_upscale.jpg" class="slide-main" style="display: none;">
+        <img src="/Content/prairie_upscale.jpg" class="slide-main" style="display: none;">
+        <img src="/Content/town_upscale.jpg" class="slide-main" style="display: block;">
+    </div>
+    <div class="container">
+        <div class="slide-navigation">
+            <div class="nav-circles">
+                <div class="nav-circle" data-slide="1"></div>
+                <div class="nav-line"></div>
+                <div class="nav-circle" data-slide="2"></div>
+                <div class="nav-line"></div>
+                <div class="nav-circle active" data-slide="3"></div>
+            </div>
+            
+            <div class="slide-text">
+                <h3 class="slide-headline"></h3>
+                <p class="slide-description"></p>
+            </div>
+        </div>
+        
+        <!-- Home Navigation Buttons -->
+        <div class="home-navigation">
+            <a href="#plan" class="home-nav-button">
+                <span class="button-icon">✈️</span>
+                <span class="button-text">Plan</span>
+            </a>
+            <a href="#inspiration" class="home-nav-button">
+                <span class="button-icon">💡</span>
+                <span class="button-text">Inspiration</span>
+            </a>
+            <a href="#activities" class="home-nav-button">
+                <span class="button-icon">🎯</span>
+                <span class="button-text">What to Do</span>
+            </a>
+        </div>
+    </div>
+</div>
+<div id="plan" class="section">
+    <div class="container" style="margin-inline: auto;align-self: flex-start;padding-top: inherit;">
+        <h2>Plan Your Trip</h2>
+        <form class="search-form">
+            @Html.AntiForgeryToken()
+            <!-- Departure -->
+            <div class="box">
+                <label for="departure" class="form-label">From</label>
+                <input type="text" class="form-control" id="departure" placeholder="Enter departure city" autocomplete="off">
+                <div class="autocomplete-suggestions" id="departure-suggestions"></div>
+                <div class="airport-selection-panel" id="departure-airports"></div>
+            </div>
+
+            <!-- Destination -->
+            <div class="box">
+                <label for="destination" class="form-label">To</label>
+                <input type="text" class="form-control" id="destination" placeholder="Enter destination city" autocomplete="off">
+                <div class="autocomplete-suggestions" id="destination-suggestions"></div>
+                <div class="airport-selection-panel" id="destination-airports"></div>
+            </div>
+
+            <!-- Departure Date -->
+            <div class="box">
+                <label for="departureDate" class="form-label">Departure</label>
+                <input type="text" class="form-control datepicker" id="departureDate" placeholder="DD/MM/YYYY" readonly>
+            </div>
+
+            <!-- Return Date -->
+            <div class="box">
+                <label for="returnDate" class="form-label">Return</label>
+                <input type="text" class="form-control datepicker" id="returnDate" placeholder="DD/MM/YYYY" readonly>
+            </div>
+
+            <!-- Passengers and Cabin Class -->
+            <div class="box passenger-dropdown">
+                <label for="passengers" class="form-label">Passengers</label>
+                <button type="button" class="passenger-button">
+                    <span class="passenger-text">1 Adult, 0 Children, ECONOMY</span>
+                    <span class="passenger-arrow"></span>
+                </button>
+                <div class="passenger-dropdown-menu">
+                    <div class="passenger-option">
+                        <div class="passenger-option-label">
+                            <span>Adults</span>
+                            <span class="passenger-option-subtitle">16+ years</span>
+                        </div>
+                        <div class="passenger-counter">
+                            <button type="button" class="counter-button minus" disabled>-</button>
+                            <input type="number" class="counter-input" value="1" min="1" max="9" readonly>
+                            <button type="button" class="counter-button plus">+</button>
+                        </div>
+                    </div>
+                    <div class="passenger-option">
+                        <div class="passenger-option-label">
+                            <span>Children</span>
+                            <span class="passenger-option-subtitle">2-15 years</span>
+                        </div>
+                        <div class="passenger-counter">
+                            <button type="button" class="counter-button minus" disabled>-</button>
+                            <input type="number" class="counter-input" value="0" min="0" max="9" readonly>
+                            <button type="button" class="counter-button plus">+</button>
+                        </div>
+                    </div>
+                    <div class="passenger-option">
+                        <div class="passenger-option-label">
+                            <span>Cabin Class</span>
+                        </div>
+                        <select class="cabin-select">
+                            <option value="ECONOMY">Economy</option>
+                            <option value="PREMIUM_ECONOMY">Premium Economy</option>
+                            <option value="BUSINESS">Business</option>
+                            <option value="FIRST">First Class</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Button -->
+            <div class="box">
+                <button type="submit" class="search-button">Search Flights</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="inspiration" class="section">
+    <div class="container" style="margin-inline: auto;align-self: flex-start;padding-top: inherit;">
+        <h2>Find Your Next Adventure</h2>
+        <form id="inspiration-form" class="search-form">
+            <div class="box">
+                <label for="insp-departure" class="form-label">Departure City</label>
+                <input id="insp-departure" class="form-control" type="text" autocomplete="off" placeholder="Enter city or airport">
+                <div id="insp-departure-suggestions" class="autocomplete-suggestions"></div>
+                <div id="insp-departure-airports" class="airport-selection-panel"></div>
+            </div>
+            <div class="box">
+                <label for="insp-date" class="form-label">Departure Date</label>
+                <input id="insp-date" class="form-control datepicker" type="text" placeholder="Select date" readonly>
+            </div>
+            <div class="box">
+                <label for="insp-duration" class="form-label">Duration (days)</label>
+                <input id="insp-duration" class="form-control" type="number" min="1" max="15" value="7">
+            </div>
+            <div class="box">
+                <label for="insp-maxprice" class="form-label">Max Price</label>
+                <input id="insp-maxprice" class="form-control" type="number" min="0" step="1" placeholder="e.g. 500">
+            </div>
+            <div class="box">
+                <button type="submit" class="search-button">Find Inspiration</button>
+            </div>
+        </form>
+        <div id="inspiration-results"></div>
+    </div>
+</div>
+
+<div id="what-to-do-section" class="section">
+    <div class="container">
+        <h2>What to Do</h2>
+        <div id="what-to-do-map" style="height: 400px; width: 100%; margin-bottom: 2rem;"></div>
+        <div id="what-to-do-content">
+            <!-- Activities, POIs, and tours will be loaded here -->
+        </div>
+    </div>
+</div>
+
+
+<div id="contact" class="section">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <div class="content-row">
+                <div class="content-col">
+                    <!-- Contact content will go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="about" class="section">
+        <div class="container">
+            <h2>About Us</h2>
+            <div class="content-row">
+                <div class="content-col">
+                    <!-- About content will go here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script src="js/flight-search.js"></script>
+    <script src="js/theme-toggle.js"></script>
+}
