@@ -112,7 +112,7 @@ namespace TravelWebsiteV3.Services
     }
 
     public async Task<IEnumerable<object>> GetPois(double latitude, double longitude)
-    {
+    {/*
         try
         {
             var parameters = Params.with("latitude", latitude.ToString(System.Globalization.CultureInfo.InvariantCulture))
@@ -130,7 +130,8 @@ namespace TravelWebsiteV3.Services
         catch (Exception ex)
         {
             throw new Exception("Error fetching POIs", ex);
-        }
+        }*/
+      return null;
     }
   }
 }
