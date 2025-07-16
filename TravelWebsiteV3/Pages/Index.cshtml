@@ -44,8 +44,12 @@
         </div>
     </div>
 </div>
-<div id="plan" class="section">
-    <div class="container" style="margin-inline: auto;align-self: flex-start;padding-top: inherit;">
+<div id="plan" class="section" style="position: relative;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; display: flex;">
+        <img src="/Content/flight_search_1.jpg" style="width: 50%; height: 100%; object-fit: cover; opacity: 0.35;" alt="Flight Search 1" />
+        <img src="/Content/flight_search_2.jpg" style="width: 50%; height: 100%; object-fit: cover; opacity: 0.35;" alt="Flight Search 2" />
+    </div>
+    <div class="container" style="margin-inline: auto;align-self: flex-start;padding-top: inherit; position: relative; z-index: 1;">
         <h2>Plan Your Trip</h2>
         <form class="search-form">
             @Html.AntiForgeryToken()
