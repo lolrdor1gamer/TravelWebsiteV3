@@ -26,7 +26,7 @@ body {
   margin: 0;
   font-family: 'Roboto', 'Calibri', sans-serif;
   overflow: clip;
-  color: light-dark(var(--light-text), var(--dark-text));
+  color: light-dark(var(--dark-charcoal), var(--dark-text));
   background: light-dark(var(--light-bg), var(--dark-bg));
 }
 
@@ -1594,3 +1594,24 @@ body.dark-mode .passenger-text {
     align-self: stretch;
   }
 }
+
+/* Flight Info Menu Styles - using existing color variables and light-dark() */
+#flight-info-menu {
+    background: light-dark(var(--white), var(--dark-surface));
+    color: light-dark(var(--dark-charcoal), var(--dark-text));
+    box-shadow: 0 2px 8px light-dark(var(--dark-charcoal), var(--dark-bg)); /* uses primary-blue and dark-charcoal */
+    border-radius: 8px; /* matches other rounded elements */
+    padding: 1rem; /* matches other container padding */
+    transition: background 0.3s, color 0.3s;
+}
+
+#flight-info-menu h4 {
+    margin-top: 0;
+    font-size: 1.2rem;
+    color: light-dark(var(--primary-blue), var(--primary-yellow));
+}
+
+#flight-info-content {
+    font-size: 1rem;
+}
+

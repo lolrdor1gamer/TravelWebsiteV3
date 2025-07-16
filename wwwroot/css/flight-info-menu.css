@@ -1,0 +1,39 @@
+﻿:root {
+    --menu-bg-light: #fff;
+    --menu-bg-dark: #222;
+    --menu-text-light: #222;
+    --menu-text-dark: #fff;
+    --menu-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    --menu-padding: 1rem;
+    --menu-border-radius: 8px;
+}
+
+body[data-theme="light"] #flight-info-menu {
+    background: var(--menu-bg-light);
+    color: var(--menu-text-light);
+    box-shadow: var(--menu-shadow);
+    border-radius: var(--menu-border-radius);
+    padding: var(--menu-padding);
+}
+
+body[data-theme="dark"] #flight-info-menu {
+    background: var(--menu-bg-dark);
+    color: var(--menu-text-dark);
+    box-shadow: var(--menu-shadow);
+    border-radius: var(--menu-border-radius);
+    padding: var(--menu-padding);
+}
+
+#flight-info-menu {
+    transition: background 0.3s, color 0.3s;
+}
+
+#flight-info-menu h4 {
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+#flight-info-content {
+    font-size: 1rem;
+}
+

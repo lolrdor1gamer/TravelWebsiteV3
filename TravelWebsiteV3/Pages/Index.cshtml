@@ -161,7 +161,7 @@
 
 <div id="what-to-do-section" class="section">
     <div class="container">
-        <h2>What to Do</h2>
+        <!--What to Do!-->
         <div id="what-to-do-map" style="height: 400px; width: 100%; margin-bottom: 2rem;"></div>
         <div id="what-to-do-content">
             <!-- Activities, POIs, and tours will be loaded here -->
@@ -192,7 +192,16 @@
         </div>
     </div>
 
+    <!-- Dropdown Flight Info Menu (hidden by default) -->
+<div id="flight-info-menu" style="display:none; position:fixed; left:0; right:0; top:60px; z-index:1000; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.15); padding:1rem;">
+    <h4>Flight Information</h4>
+    <div id="flight-info-content">
+        <!-- Flight info will be inserted here -->
+    </div>
+</div>
+
 @section Scripts {
     <script src="js/flight-search.js"></script>
     <script src="js/theme-toggle.js"></script>
+    <script src="js/what-to-do-map.js"></script>
 }

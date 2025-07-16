@@ -111,27 +111,29 @@ namespace TravelWebsiteV3.Services
       }
     }
 
-    public async Task<IEnumerable<object>> GetPois(double latitude, double longitude)
-    {/*
+    public async Task<Activity[]> GetActivities(double latitude, double longitude)
+    {
         try
         {
             var parameters = Params.with("latitude", latitude.ToString(System.Globalization.CultureInfo.InvariantCulture))
                 .and("longitude", longitude.ToString(System.Globalization.CultureInfo.InvariantCulture))
-                .and("radius", "20"); // 20km radius
-           // var pois = await Task.Run(() => _amadeus.referenceData.locations.pointsOfInterest.get(parameters));
-           var pois = await Task.Run(() => _amadeus.shopping.hotelOffers.get(parameters));
-            return pois.Select(poi => new {
-                name = poi.hotel,
-                //latitude = poi.,
-                // = poi.geoCode?.longitude,
-                category = poi.type
-            }).ToList();
+                .and("radius", "20");
+            var activitiesRaw = await Task.Run(() => _amadeus.shopping.activities.get(parameters));
+
+            List<string> cat = new List<string>();
+            foreach (var x in activitiesRaw) { if (!cat.Contains(x.type)) cat.Add(x.type); }
+            
+            var activities = activitiesRaw.Where(x => {
+                if (double.TryParse(x.rating, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double rating))
+                    return rating > 4.1;
+                return false;
+            });
+            return activities.ToArray();
         }
         catch (Exception ex)
         {
             throw new Exception("Error fetching POIs", ex);
-        }*/
-      return null;
+        }
     }
   }
 }

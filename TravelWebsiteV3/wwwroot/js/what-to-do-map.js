@@ -34,14 +34,14 @@ window.renderWhatToDoMap = function(city, lat, lng) {
 
     // Optionally, fetch and display POIs/activities here
     // Example: fetch POIs from backend and add markers
-    fetch(`/api/pois?lat=${centerLat}&lng=${centerLng}`)
+    fetch(`/Index?handler=Activities&lat=${centerLat}&lng=${centerLng}`)
         .then(response => response.json())
-        .then(pois => {
-            if (Array.isArray(pois)) {
-                pois.forEach(poi => {
-                    if (poi.latitude && poi.longitude) {
-                        L.marker([poi.latitude, poi.longitude]).addTo(map)
-                            .bindPopup(`<b>${poi.name}</b><br>${poi.category || ''}`);
+        .then(activities => {
+            if (Array.isArray(activities)) {
+                activities.forEach(activity => {
+                    if (activity.geoCode && activity.geoCode.latitude && activity.geoCode.longitude) {
+                        L.marker([activity.geoCode.latitude, activity.geoCode.longitude]).addTo(map)
+                            .bindPopup(`<b>${activity.name}</b><br>${activity.shortDescription || ''}`);
                     }
                 });
             }

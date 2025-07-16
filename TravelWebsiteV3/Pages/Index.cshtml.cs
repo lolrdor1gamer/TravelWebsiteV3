@@ -132,11 +132,11 @@ public class IndexModel : PageModel
         }
     }
 
-    public async Task<IActionResult> OnGetPois(double lat, double lng)
+    public async Task<IActionResult> OnGetActivities(double lat, double lng)
     {
         try
         {
-            var pois = await _amadeusService.GetPois(lat, lng);
+            var pois = await _amadeusService.GetActivities(lat, lng);
             return new JsonResult(pois);
         }
         catch (Exception ex)

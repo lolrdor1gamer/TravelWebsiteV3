@@ -92,10 +92,10 @@ function setupDatepicker(inputId) {
         tempInput.style.opacity = '0';
         tempInput.style.pointerEvents = 'none';
         tempInput.value = hiddenInput.value || minDate;
-        
+
         document.body.appendChild(tempInput);
         tempInput.showPicker();
-        
+
         tempInput.addEventListener('change', function() {
             if (this.value) {
                 hiddenInput.value = this.value;
@@ -524,8 +524,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         inspirations.forEach(inspiration => {
             const card = document.createElement('div');
-            card.className = 'inspiration-card'; 
-
+            card.className = 'inspiration-card';
+            // Add lat/lng as data attributes if available
+            card.setAttribute('data-destination-city', inspiration.destination);
+            if (inspiration.geoCode) {
+                card.setAttribute('data-destination-lat', inspiration.geoCode.latitude);
+                card.setAttribute('data-destination-lng', inspiration.geoCode.longitude);
+            }
             card.innerHTML = `
                 <div class="inspiration-card-header">
                     <h4>${inspiration.destination}</h4>
@@ -573,7 +578,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const flightCard = document.createElement('div');
             flightCard.className = 'flight-card';
-            
+            // Add lat/lng as data attributes if available
+            flightCard.setAttribute('data-destination-city', lastSegment.arrival.iataCode);
+            if (lastSegment.arrival.latitude && lastSegment.arrival.longitude) {
+                flightCard.setAttribute('data-destination-lat', lastSegment.arrival.latitude);
+                flightCard.setAttribute('data-destination-lng', lastSegment.arrival.longitude);
+            }
             flightCard.innerHTML = `
                 <div class="flight-info">
                     <div class="flight-route">
@@ -596,15 +606,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="flight-price">
                     <h3>${flight.price.total} ${flight.price.currency}</h3>
-                    <button class="select-flight" 
-                        data-destination-city="${lastSegment.arrival.iataCode}" 
-                        data-destination-lat="${lastSegment.arrival.latitude || ''}"
-                        data-destination-lng="${lastSegment.arrival.longitude || ''}">
-                        Select
-                    </button>
+                    <button class="select-flight">Select</button>
                 </div>
             `;
-            
             resultsContainer.appendChild(flightCard);
         });
 
@@ -731,40 +735,114 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Helper to show single-airport selection panel (with country and distance)
-    function showAirportSelectionPanelSingle(airports, panelId, onSelect, selectedAirport = null) {
-        const panel = document.getElementById(panelId);
-        panel.innerHTML = '';
-        if (selectedAirport) {
-            // Show chip with pin and cross
-            panel.innerHTML = `<div class='airport-chip'><span class='airport-pin'>📍</span>${selectedAirport.name} (${selectedAirport.iataCode})<button class='airport-chip-remove' title='Remove'>&times;</button></div>`;
-            const removeBtn = panel.querySelector('.airport-chip-remove');
-            removeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                onSelect(null);
-            });
-            return;
-        }
-        if (!airports || airports.length === 0) {
-            panel.innerHTML = `<div class="airport-panel-empty"><span class='empty-icon'>🛫</span>No airports found.<br><span style='font-size:0.95em'>Try another city nearby!</span></div>`;
-            return;
-        }
-        airports.forEach(airport => {
-            const card = document.createElement('div');
-            card.className = 'airport-card';
-            let distanceStr = '';
-            if (airport.distance && typeof airport.distance.value !== 'undefined' && airport.distance.unit) {
-                distanceStr = `${airport.distance.value} ${airport.distance.unit}`;
+    // --- What to Do Section Integration ---
+    function scrollToWhatToDoAndShowMap(city, lat, lng) {
+        const section = document.getElementById('what-to-do-section');
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+            if (window.renderWhatToDoMap) {
+                window.renderWhatToDoMap(city, lat, lng);
             }
-            card.innerHTML = `<div class="airport-main"><span class="airport-card-icon">🛬</span><span class="airport-name">${airport.name}</span> <span class="airport-code">(${airport.iataCode})</span> <span class="airport-country">${airport.address.countryName}</span> <span class="airport-distance">${distanceStr}</span></div>`;
-            if (selectedAirport && selectedAirport.iataCode === airport.iataCode) {
-                card.classList.add('selected');
+        }
+    }
+
+    // Helper to get coordinates for a city/airport using backend
+    async function getCoordinatesForDestination(destination) {
+        // Try to use FindNearestAirport endpoint for coordinates
+        try {
+            const response = await fetch(`/Index?handler=FindNearestAirport&latitude=0&longitude=0&keyword=${encodeURIComponent(destination)}`);
+            if (response.ok) {
+                const airports = await response.json();
+                if (Array.isArray(airports) && airports.length > 0) {
+                    return { lat: airports[0].geoCode.latitude, lng: airports[0].geoCode.longitude };
+                }
             }
-            card.addEventListener('click', () => {
-                onSelect(airport);
-            });
-            panel.appendChild(card);
+        } catch {}
+        return null;
+    }
+
+    // Listen for ticket selection in Plan section
+    function setupPlanTicketSelection() {
+        const results = document.getElementById('flight-results');
+        if (!results) return;
+        results.addEventListener('click', async function(e) {
+            const btn = e.target.closest('.select-flight');
+            if (btn) {
+                const card = btn.closest('.flight-card');
+                if (card) {
+                    const destination = card.getAttribute('data-destination-city') || card.getAttribute('data-destination');
+                    let lat = card.getAttribute('data-destination-lat');
+                    let lng = card.getAttribute('data-destination-lng');
+                    if (lat && lng) {
+                        scrollToWhatToDoAndShowMap(destination, lat, lng);
+                    } else if (destination) {
+                        let coords = await getCoordinatesForDestination(destination);
+                        if (!coords) coords = { lat: 48.8566, lng: 2.3522 }; // fallback Paris
+                        scrollToWhatToDoAndShowMap(destination, coords.lat, coords.lng);
+                    }
+                }
+            }
         });
     }
+    function setupInspirationTicketSelection() {
+        const results = document.getElementById('inspiration-results');
+        if (!results) return;
+        results.addEventListener('click', async function(e) {
+            const btn = e.target.closest('.select-flight');
+            if (btn) {
+                const card = btn.closest('.inspiration-card');
+                if (card) {
+                    const destination = card.getAttribute('data-destination-city') || card.getAttribute('data-destination');
+                    let lat = card.getAttribute('data-destination-lat');
+                    let lng = card.getAttribute('data-destination-lng');
+                    if (lat && lng) {
+                        scrollToWhatToDoAndShowMap(destination, lat, lng);
+                    } else if (destination) {
+                        let coords = await getCoordinatesForDestination(destination);
+                        if (!coords) coords = { lat: 48.8566, lng: 2.3522 }; // fallback Paris
+                        scrollToWhatToDoAndShowMap(destination, coords.lat, coords.lng);
+                    }
+                }
+            }
+        });
+    }
+
+    setupPlanTicketSelection();
+    setupInspirationTicketSelection();
 });
 
+// Helper to show single-airport selection panel (with country and distance)
+function showAirportSelectionPanelSingle(airports, panelId, onSelect, selectedAirport = null) {
+    const panel = document.getElementById(panelId);
+    panel.innerHTML = '';
+    if (selectedAirport) {
+        // Show chip with pin and cross
+        panel.innerHTML = `<div class='airport-chip'><span class='airport-pin'>📍</span>${selectedAirport.name} (${selectedAirport.iataCode})<button class='airport-chip-remove' title='Remove'>&times;</button></div>`;
+        const removeBtn = panel.querySelector('.airport-chip-remove');
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            onSelect(null);
+        });
+        return;
+    }
+    if (!airports || airports.length === 0) {
+        panel.innerHTML = `<div class="airport-panel-empty"><span class='empty-icon'>🛫</span>No airports found.<br><span style='font-size:0.95em'>Try another city nearby!</span></div>`;
+        return;
+    }
+    airports.forEach(airport => {
+        const card = document.createElement('div');
+        card.className = 'airport-card';
+        let distanceStr = '';
+        if (airport.distance && typeof airport.distance.value !== 'undefined' && airport.distance.unit) {
+            distanceStr = `${airport.distance.value} ${airport.distance.unit}`;
+        }
+        card.innerHTML = `<div class="airport-main"><span class="airport-card-icon">🛬</span><span class="airport-name">${airport.name}</span> <span class="airport-code">(${airport.iataCode})</span> <span class="airport-country">${airport.address.countryName}</span> <span class="airport-distance">${distanceStr}</span></div>`;
+        if (selectedAirport && selectedAirport.iataCode === airport.iataCode) {
+            card.classList.add('selected');
+        }
+        card.addEventListener('click', () => {
+            onSelect(airport);
+        });
+        panel.appendChild(card);
+    });
+}
